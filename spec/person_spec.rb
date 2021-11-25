@@ -1,9 +1,8 @@
 require './lib/person'
 require './lib/craft'
-require './lib/event'
 
 RSpec.describe Person do
-  let(:person) {Person.new({name: 'Hector', interests: ['sewing', 'millinery', 'drawing']})}
+  let(:person) { person = Person.new({ name: 'Hector', interests: %w[sewing millinery drawing] }) }
   it 'exists' do
     actual = person
     expected = Person
@@ -16,10 +15,10 @@ RSpec.describe Person do
       expected = 'Hector'
 
       expect(actual).to eq(expected)
-  end
+    end
     it 'has interests' do
       actual = person.interests
-      expected = ["sewing", "millinery", "drawing"]
+      expected = %w[sewing millinery drawing]
 
       expect(actual).to eq(expected)
     end
@@ -30,31 +29,41 @@ RSpec.describe Person do
       expect(actual).to eq(expected)
     end
   end
-  describe '#add_supply/1' do
-    it 'can add supplies' do
-      sewing = Craft.new('sewing', {fabric: 5, scissors: 1, thread: 1, sewing_needles: 1})
+  describe '#add_supply' do
+    it 'can add a supply' do
       person.add_supply('fabric', 4)
+      actual = person.supplies
+      expected =
+        {
+          'fabric' => 4
+        }
+
+      expect(actual).to eq(expected)
+      person.add_supply('fabric', 3)
       person.add_supply('scissors', 1)
       actual = person.supplies
-      expected = {"fabric"=>4, "scissors"=>1}
-
+      expected =
+        {
+          'fabric' => 7,
+          'scissors' => 1
+        }
       expect(actual).to eq(expected)
     end
   end
-  describe '#can_build?/1' do
-    it 'says if they can build' do
-
-      sewing = Craft.new('sewing', {fabric: 5, scissors: 1, thread: 1, sewing_needles: 1})
-      event = Event.new("Carla's Craft Connection", [sewing], [person])
+  describe '#can build?\1' do
+    it 'tells you person can build craft or not' do
+      sewing = Craft.new('sewing', { fabric: 5, scissors: 1, thread: 1, sewing_needles: 1 })
+      person.add_supply('fabric', 7)
       person.add_supply('thread', 1)
-      person.add_supply('sewing_needles', 1)
       actual = person.can_build?(sewing)
       expected = false
+
       expect(actual).to eq(expected)
-      person.add_supply('fabric', 5)
       person.add_supply('scissors', 1)
+      person.add_supply('sewing_needles', 1)
       actual = person.can_build?(sewing)
       expected = true
+
       expect(actual).to eq(expected)
     end
   end

@@ -11,19 +11,20 @@ class Event
   end
 
   def craft_with_most_supplies
-    most_crafts = crafts.group_by(&:name).max_by do  |_k, v|
-       v[0].supplies_required.length
-    end
-    most_crafts[0]
+    crafts.max_by{|craft| craft.supplies_required.length}.name
   end
 
   def supply_list
-    total_supplies = []
-    crafts.each do |craft|
-      craft.supplies_required.keys.each do |key|
-        total_supplies <<  key.to_s
-        end
+    crafts.flat_map(&:supplies_required).flat_map(&:keys).map(&:to_s).uniq
+  end
+  def attendees_by_craft_interest
+    crafts.map(&:name).each_with_object({}) do |name, result|
+      result[name] = attendees.find_all do |attendee|
+        attendee.interests.include?(name)
       end
-    total_supplies.uniq
+    end
+  end
+  def crafts_that_use(supply)
+    crafts.find_all{|craft| craft.supplies_required.include?(supply.to_sym)}
   end
 end
